@@ -1,14 +1,21 @@
 ﻿using GMap.NET;
 using GMap.NET.WindowsForms;
-using GMap.NET.WindowsForms.Markers;
+using System;
 using System.Drawing;
+using System.Runtime.Serialization;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
+/*
 namespace GPX_File_Viewer.GMapCustomisations
 {
+    [Serializable]
     public class CustomisedGMapMarker : GMapMarker
     {
         private readonly int _size = 10; // Marker size
 
+        protected CustomisedGMapMarker(SerializationInfo info, StreamingContext context) : base(info, context)
+        { 
+        }
         public CustomisedGMapMarker(PointLatLng pos) : base(pos)
         {
             // Initialize any other properties or data you need
@@ -27,3 +34,4 @@ namespace GPX_File_Viewer.GMapCustomisations
         }
     }
 }
+*/
