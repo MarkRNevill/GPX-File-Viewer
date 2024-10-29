@@ -75,7 +75,7 @@ namespace GPX_File_Viewer
             gMapControl1.Overlays.Add(pointOverlay);
 
 
-            gMapControl1.OnMarkerClick += new MarkerClick(gMapControl1_OnMarkerClick);
+            gMapControl1.OnMarkerClick += new MarkerClick(GMapControl1_OnMarkerClick);
 
 
             
@@ -98,19 +98,12 @@ namespace GPX_File_Viewer
             */
         }
 
-        private void gMapControl1_OnMarkerClick(GMapMarker item, MouseEventArgs e)
+        private void GMapControl1_OnMarkerClick(GMapMarker item, MouseEventArgs e)
         {
             MessageBox.Show("Marker Click - " + item.Position.Lat + ", " + item.Position.Lng);
             MessageBox.Show($"Size {item.Size}");
 
 
-        }
-
-        private void gMapControl1_OnRouteClick(GMapRoute item, MouseEventArgs e)
-        {
-       
-            
-            MessageBox.Show("Route Click - " + item.IsHitTestVisible);
         }
 
         private void GMapControl1_MouseClick(object sender, MouseEventArgs e)
@@ -124,12 +117,12 @@ namespace GPX_File_Viewer
 
             if (((GMapControl)sender).IsMouseOverPolygon)
             {
-                res = res + " Polygon ";
+                res += " Polygon ";
             }
 
             if (((GMapControl)sender).IsMouseOverRoute)
             {
-                res = res + "Route ";
+                res += "Route ";
             }
             if (res == "")
             {
@@ -148,40 +141,6 @@ namespace GPX_File_Viewer
             }
         }
 
-
-
-        private void AddRoute(string routeName, List<GPX_File_Viewer.GPX_Representations.WayPoint> points, System.Drawing.Color color)
-        {
-
-            List<PointLatLng> routePoints = new List<PointLatLng>();
-            foreach (GPX_File_Viewer.GPX_Representations.WayPoint point in points)
-            {
-                routePoints.Add(new PointLatLng(point.Latitude, point.Longitude));
-            }
-            GMapRoute route = new GMapRoute(routePoints, routeName)
-            {
-                Stroke = new Pen(color, 2)
-                
-
-            };
-            route.IsHitTestVisible = true;
-            
-            mapOverlay.Routes.Add(route);
-            //gMapControl1.Overlays.Add(mapOverlay);
-
-
-            //foreach (GPX_File_Viewer.GPX_Representations.WayPoint point in points)
-            //{
-            //    routeOverlay.Markers.Add(new GMarkerGoogle(new PointLatLng(point.Latitude, point.Longitude), GMarkerGoogleType.none) );
-            //}
-
-            // gMapControl1.UpdateRouteLocalPosition(route);
-
-            MessageBox.Show("Google says this route is " + route.Distance);
-
-
-        }
-
         private void NewAddRoute(string routeName, List<GPX_File_Viewer.GPX_Representations.WayPoint> points, System.Drawing.Color color)
         {
 
@@ -189,19 +148,21 @@ namespace GPX_File_Viewer
             foreach (GPX_File_Viewer.GPX_Representations.WayPoint point in points)
             {
                 routePoints.Add(new PointLatLng(point.Latitude, point.Longitude));
-                 GMapMarker routeMarker = new GMarkerGoogle(new PointLatLng(point.Latitude, point.Longitude), GMarkerGoogleType.gray_small);
-                routeMarker.Size = new Size(Width= 2, Height= 2);
-                //GMapMarker routeMarker = new CustomisedGMapMarker(new PointLatLng(point.Latitude, point.Longitude));
-                routeMarker.IsHitTestVisible=true;
+                GMapMarker routeMarker = new GMarkerGoogle(new PointLatLng(point.Latitude, point.Longitude), GMarkerGoogleType.gray_small)
+                {
+                    Size = new Size(Width = 2, Height = 2),
+                    //GMapMarker routeMarker = new CustomisedGMapMarker(new PointLatLng(point.Latitude, point.Longitude));
+                    IsHitTestVisible = true
+                };
                 mapOverlayMarkers.Markers.Add(routeMarker);
 
                    // mapOverlay.Markers.Add(point);
             }
             GMapRoute route = new GMapRoute(routePoints, routeName)
             {
-                Stroke = new Pen(color, 2)
+                Stroke = new Pen(color, 2),
+                IsHitTestVisible = true
             };
-            route.IsHitTestVisible = true;
             //mapOverlay.Routes.Add(route);
             //gMapControl1.Overlays.Add(mapOverlay);
             gMapControl1.Overlays.Add(mapOverlayMarkers);
@@ -232,73 +193,6 @@ namespace GPX_File_Viewer
         private void ClearRoutes()
         {
             mapOverlay.Routes.Clear();
-        }
-
-        private Dictionary<string, PointLatLng> LoadCSVForDeb(List<string> codesIWant)
-        {
-            Dictionary<string, PointLatLng> valuePairs = new Dictionary<string, PointLatLng>();
-            using (StreamReader sr = new StreamReader(@"C:\GPXFiles\Open_Postcode_Geo.csv"))
-            {
-                //string[] headers = sr.ReadLine().Split(',');
-                //foreach (string header in headers)
-                //for (int i = 1; i <= 9; i++)
-                //{
-                //dt.Columns.Add("Column" + i.ToString());
-                //}
-                while (!sr.EndOfStream)
-                {
-                    string[] rows = sr.ReadLine().Split(',');
-                    //DataRow dr = dt.NewRow();
-
-
-                    //for (int i = 0; i < 9; i++)
-                    //{
-                    //    dr[i] = rows[i];
-                    //}
-                    //dt.Rows.Add(dr);
-                    try
-                    {
-                        if (codesIWant.Contains(rows[0].ToString()))
-                        {
-                            valuePairs.Add(rows[0].ToString(), new PointLatLng(Convert.ToDouble(rows[7]), Convert.ToDouble(rows[8])));
-                        }
-                    }
-                    catch
-                    {
-                        //MessageBox.Show(rows[0].ToString());
-                    }
-                }
-
-            }
-            return valuePairs;
-        }
-
-
-        private void AddMarkerForDeb()
-        {
-            List<string> codesToMark = new List<string>
-            {
-                "CM6 1NW",
-                "IG8 8JG",
-                "CM16 4QE",
-                "RM4 1RS"
-            };
-            Dictionary<string, PointLatLng> postCodes = LoadCSVForDeb(codesToMark);
-            foreach (KeyValuePair<string, PointLatLng> postcode in postCodes)
-            {
-                GMap.NET.WindowsForms.GMapOverlay markers = new GMap.NET.WindowsForms.GMapOverlay("markers");
-                GMapMarker marker =
-                    new GMap.NET.WindowsForms.Markers.GMarkerGoogle(
-                        postcode.Value,
-                        GMap.NET.WindowsForms.Markers.GMarkerGoogleType.red_dot)
-                    {
-                        ToolTipText = postcode.Key
-                    };
-                markers.Markers.Add(marker);
-                gMapControl1.Overlays.Add(markers);
-            }
-
-            gMapControl1.ShowCenter = false;
         }
 
         private void Button1_Click(object sender, EventArgs e)
